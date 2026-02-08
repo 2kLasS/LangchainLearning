@@ -21,6 +21,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 # print(f"向量化长度: {len(result)}")
 
 # 读取并切分文档
+print("正在切分文档...")
 origin_doc = TextLoader("../../文件/deepseek百度百科.txt", encoding="utf-8").load()
 mySplitter = RecursiveCharacterTextSplitter(
     chunk_size=512,
@@ -29,9 +30,11 @@ mySplitter = RecursiveCharacterTextSplitter(
 )
 # 返回一个列表，里面存储的是Document对象
 chunks = mySplitter.split_documents(origin_doc)
-print(chunks[:2])
+# print(chunks[:2])
+print("切分文档成功")
 
 # 创建数据库存储
+print("正在创建数据库...")
 embedding_model = OllamaEmbeddings(model="bge-m3")
 
 docStore = InMemoryStore()
@@ -47,13 +50,16 @@ retriever = MultiVectorRetriever(
     docstore=docStore,
     id_key=idKey
 )
+print("数据库创建成功")
 
 # 文档id列表
 doc_ids = [str(uuid.uuid4()) for _ in range(len(chunks))]
 
 # 存入原始切块文档
+print("正在存储原始文档...")
 id_doc_pairs = list(zip(doc_ids, chunks))
 retriever.docstore.mset(id_doc_pairs)
+print("原始文档存储成功")
 
 # 对文本做摘要
 llm = ChatOpenAI(
@@ -70,15 +76,16 @@ summarize_chain = (
     | StrOutputParser()
 )
 
-try_batch = chunks[:2]
+# try_batch = chunks[:2]
 print("正在生成文本摘要...")
-summarization = summarize_chain.batch(try_batch, config={"max_concurrency" : 5})
+summarization = summarize_chain.batch(chunks, config={"max_concurrency" : 5})
 print("生成摘要成功")
-print("正在写入向量数据库...")
 
 # 将摘要转为Document对象并加上id
+print("正在写入向量数据库...")
 summarization = [Document(doc, metadata={idKey: doc_ids[i]}) for i, doc in enumerate(summarization)]
 retriever.vectorstore.add_documents(summarization)
+print("存入向量数据成功")
 
 # 测试返回结果，是一个Document列表
 # result = retriever.invoke("deepseek的公司在哪")
@@ -123,5 +130,12 @@ rag_chain = (
     ) | rag_prompt | llm | StrOutputParser()
 )
 
-resp = rag_chain.invoke({"question" : "开发deepseek的办公场所在哪里？"})
-print(resp)
+
+while True:
+    user_data = input("请输入你的问题，或者输入stop退出: ")
+    if user_data == "stop":
+        break
+    resp = rag_chain.invoke({"question" : user_data})
+    print(resp)
+
+print("程序结束")
