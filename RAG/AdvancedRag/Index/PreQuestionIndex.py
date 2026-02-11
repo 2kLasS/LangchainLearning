@@ -15,7 +15,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
-docs = TextLoader("../../文件/deepseek百度百科.txt", encoding='utf-8').load()
+docs = TextLoader("../../../文件/deepseek百度百科.txt", encoding='utf-8').load()
 splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=30, separators=["\n\n", "\n", "。", "！", "？", "，", "、", ""])
 chunks = splitter.split_documents(docs)
 

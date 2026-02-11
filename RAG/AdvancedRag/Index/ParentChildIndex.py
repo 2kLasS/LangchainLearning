@@ -14,7 +14,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 from langchain_core.documents import Document
 
 print("正在读取文档...")
-docs = TextLoader("../../文件/deepseek百度百科.txt", encoding='utf-8').load()
+docs = TextLoader("../../../文件/deepseek百度百科.txt", encoding='utf-8').load()
 print("文档加载完成")
 
 print("正在创建数据库与检索器...")

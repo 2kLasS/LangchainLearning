@@ -22,7 +22,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 # 读取并切分文档
 print("正在切分文档...")
-origin_doc = TextLoader("../../文件/deepseek百度百科.txt", encoding="utf-8").load()
+origin_doc = TextLoader("../../../文件/deepseek百度百科.txt", encoding="utf-8").load()
 mySplitter = RecursiveCharacterTextSplitter(
     chunk_size=512,
     chunk_overlap=50,
