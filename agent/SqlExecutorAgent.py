@@ -25,7 +25,13 @@ def get_database_information()->str:
     return "\n".join(db_info)
 
 
+def execute_sql(sql_statement:str)->tuple:
+    "执行sql语句并返回执行结果"
+    # 此处可以优化，应当加入错误处理，且有sql注入的风险
+    cursor.execute(sql_statement)
+    result = cursor.fetchall()
+    return result
 
-db_information = get_database_information()
-print(db_information)
-print(type(db_information))
+
+if __name__ == "__main__":
+    execute_sql("select sno from score where grade >= 90")
